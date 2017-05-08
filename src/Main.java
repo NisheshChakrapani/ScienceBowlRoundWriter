@@ -17,18 +17,11 @@ import java.util.Scanner;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        writeRound(2, 10);
-        writeRound(2, 11);
-        writeRound(2, 12);
-        writeRound(2, 13);
-        writeRound(2, 14);
-        writeRound(2, 15);
-        writeRound(2, 16);
-        writeRound(2, 17);
+
     }
 
     public static void writeRound(int set, int round) throws IOException {
-        File file = new File("C:\\Users\\nishu\\Downloads\\set" + set + "round" + round + ".pdf");
+        File file = new File("set" + set + "round" + round + ".pdf");
         PDDocument document = null;
         document = PDDocument.load(file);
         document.getClass();
@@ -45,11 +38,14 @@ public class Main {
             }
         }
         Scanner scan = new Scanner(sb.toString());
-        File writeTo = new File("Set"+set+"Round"+round+".txt");
+        File writeTo = new File("set "+set+"\\Set"+set+"Round"+round+".txt");
         BufferedWriter bw = new BufferedWriter(new FileWriter(writeTo));
         String newLine = System.getProperty("line.separator");
         while (scan.hasNextLine()) {
             String line = scan.nextLine();
+            if (line.contains("___")) {
+                line = " ";
+            }
             if (!line.contains("Page ") && !line.contains("High School Round ") && !line.contains("ROUND ") && !line.contains("Solution:")) {
                 line.trim();
                 if (!line.isEmpty() && !line.equals(" ")) {
@@ -87,12 +83,20 @@ public class Main {
                         while (i < split.length) {
                             String curr = split[i];
                             if (curr.trim().length()>0) {
-                                if (curr.equals("BIOLOGY") || curr.equals("CHEMISTRY") || curr.equals("PHYSICS") || curr.equals("MATH") || curr.equals("ASTRONOMY")) {
+                                if (curr.equals("BIOLOGY") || curr.equals("CHEMISTRY") || curr.equals("PHYSICS") || curr.equals("MATH") || curr.equals("ASTRONOMY") || curr.equals("ENERGY")) {
                                     bw.write(curr + newLine);
                                 } else if (curr.equals("EARTH") || curr.equals("GENERAL") || curr.equals("COMPUTER")) {
-                                    bw.write(curr);
-                                    i++;
-                                    bw.write(" " + split[i] + newLine);
+                                    if (split[i+1].equals("AND")) {
+                                        bw.write(curr + " ");
+                                        i++;
+                                        bw.write(split[i] + " ");
+                                        i++;
+                                        bw.write(split[i] + newLine);
+                                    } else {
+                                        bw.write(curr);
+                                        i++;
+                                        bw.write(" " + split[i] + newLine);
+                                    }
                                 } else if (curr.equals("Multiple")) {
                                     bw.write(curr.toUpperCase());
                                     i++;
@@ -114,14 +118,14 @@ public class Main {
                             while (!letterFound) {
                                 if (split[i].contains("W)") || split[i].contains("X)") || split[i].contains("Y)") || split[i].contains("Z)")) {
                                     String letter = split[i].substring(0, 1).toLowerCase();
-                                    bw.write(letter + " OR");
+                                    bw.write(letter + " OR ");
                                     letterFound = true;
                                 }
                                 i++;
                             }
                             for (int j = i; j < split.length; j++) {
                                 if (split[j].trim().contains("(ACCEPT:") || split[j].trim().equals("or")) {
-                                    bw.write("OR");
+                                    bw.write("OR ");
                                 }
                                 bw.write(split[j].toLowerCase() + " ");
                             }
@@ -137,10 +141,13 @@ public class Main {
                     } else if (line.trim().length()>0){
                         bw.write(line);
                         bw.write(newLine);
+                    } else if (line.contains("_")) {
+                        bw.write(newLine);
                     }
                 }
             }
         }
         bw.close();
+        file.deleteOnExit();
     }
 }
